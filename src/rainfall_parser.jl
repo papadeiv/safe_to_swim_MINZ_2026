@@ -10,7 +10,10 @@ function rainfall_parser(filename, col_idx)
        river = df[2:end,site]
 
        # Clean the data
-       filter_idx = findall(!ismissing, river)
+	filter_idx = findall(
+   	 i -> !ismissing(river[i]) && !ismissing(timestep[i]),
+   	 eachindex(river)
+	)
        date = Date.(timestep[filter_idx], dateformat"d/mm/yyyy HH:MM:SS p")
        rainfall = parse.(Float64, river[filter_idx])
 
