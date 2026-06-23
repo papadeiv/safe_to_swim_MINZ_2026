@@ -10,7 +10,7 @@ filename = "rainfall/RFTOTAL.csv"
 site_idx = 56
 data = rainfall_parser(filename, site_idx)
 
-# Extract the dates and rainfall
+# Extract the dates and flow
 rainfall = float.(data.data[:,2])
 dates = Date.(string.(data.data[:,1]), DateFormat("yyyy-mm-d"))
 
@@ -38,10 +38,10 @@ rainfall_matrix = Matrix{Any}(undef, length(matching_idx), 4)
 for (n, idx) in enumerate(matching_idx)
         rainfall_matrix[n,1] = dates[idx]
         rainfall_matrix[n,2] = rainfall[idx]
-        rainfall_matrix[n,3] = max(rainfall[idx],rainfall[idx-1])
-        rainfall_matrix[n,4] = rainfall[idx]+rainfall[idx-1]
+        rainfall_matrix[n,3] = max(rainfall[idx],rainfall[idx-1],rainfall[idx-2],rainfall[idx-3])
+        rainfall_matrix[n,4] = rainfall[idx]+rainfall[idx-1]+rainfall[idx-2]+rainfall[idx-3]
 end
 
-colnames = ["day", "1 day rainfall", "2 days max rainfall", "2 days total rainfall"]
+colnames = ["day", "1 day", "4 days max", "4 days total"]
 df = DataFrame(rainfall_matrix, Symbol.(colnames))
-CSV.write("../data/observations/rainfall/2.csv", df)
+CSV.write("../data/observations/rainfall/4.csv", df)
