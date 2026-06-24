@@ -6,23 +6,42 @@ include("../src/assembler.jl")
 
 # Build the observation matrices
 observation_matrices = assembler()
-#=
-flow_matrix = observation_matrices.flow_matrix
-rainfall_matrix = observation_matrices.rainfall_matrix
+flow_df = observation_matrices.flow_matrix
+rainfall_df = observation_matrices.rainfall_matrix
+
+# Extract the measurement dates
+flow_dates = flow_df[!,(names(flow_df))[1]]
+rainfall_dates = rainfall_df[!,(names(rainfall_df))[1]]
+
+# Loop over the measurement dates
+missing_idx = Integer[]
+for (idx, date) in enumerate(rainfall_dates)
+        # Check if the flow dates and the rainfall dates match
+        if date ∈ flow_dates
+                # Skip this step
+        else
+                push!(missing_idx, idx)
+        end
+end
+
+# Remove the missing measurements from the rainfall data
+deleteat!(rainfall_df, missing_idx)
 
 # Build the sample
-sample = hcat(flow_matrix[:, 2:end], rainfall_matrix[:, 2:end], makeunique=true)
+sample = hcat(flow_df, rainfall_df[:, 3:end])
 CSV.write("../data/observations/sample.csv", sample)
 
+# Normalize the sample (zero mean and unitary standard deviation)
+X = (Float64.(Matrix(sample[:,2:end])) .- mean(Float64.(Matrix(sample[:,2:end])), dims=1))./std(Float64.(Matrix(sample[:,2:end])), dims=1)
+
 # Compute the covariance matrix
-X = Float64.(Matrix(sample))
 Σ = transpose(X)*X
+CSV.write("../data/observations/covariance.csv", DataFrame(Σ, :auto); header=false)
 
 # Perform the eigendecomposition of the covariance matrix
 decomposition = eigen(Σ)
 Λ = decomposition.values
-V = decomposition.vectors 
-=#
+V = decomposition.vectors
 
 #=
 using GLMakie
