@@ -137,7 +137,7 @@ function assembler(sitenames)
         printstyled("Assembling the data matrices\n"; bold=true, underline=true, color=:light_blue)
         @showprogress for n in 2:7
                 # Extract the flow data 
-                filename = "../results/flow_max/$n.csv"
+                filename = "../results/data/flow_max/$n.csv"
                 df = CSV.read(filename, DataFrame)
                 flow_ecoli_dates = df[!,(names(df))[1]]
                 flow_ecoli_value = df[!,(names(df))[2]]
@@ -148,7 +148,7 @@ function assembler(sitenames)
                 flow_names = [(names(df))[m] for m in 1:6]
 
                 # Extract the rainfall data 
-                filename = "../results/rainfall/$n.csv"
+                filename = "../results/data/rainfall/$n.csv"
                 df = CSV.read(filename, DataFrame)
                 rainfall_ecoli_dates = df[!,(names(df))[1]]
                 rainfall_ecoli_value = df[!,(names(df))[2]]
@@ -187,4 +187,23 @@ function assembler(sitenames)
                flow_matrix = DataFrame(flow_matrix, Symbol.(flow_sample_names)),
                rainfall_matrix = DataFrame(rainfall_matrix, Symbol.(rainfall_sample_names)),
               )
+end
+
+function builder(observations)
+        # Extract the flow and rainfall matrices
+        flow_df = observations.flow_matrix
+        rainfall_df = observations.rainfall_matrix
+
+        # Extract the measurement dates and find the intersection
+        flow_dates = flow_df[!,(names(flow_df))[1]]
+        rainfall_dates = rainfall_df[!,(names(rainfall_df))[1]]
+        common_dates = intersect(flow_dates, rainfall_dates)
+
+        # Remove missing measurements from the datasets and align them
+        flow_df = flow_df[in.(flow_dates, Ref(common_dates)),:]
+        rainfall_df = rainfall_df[in.(rainfall_dates, Ref(common_dates)),:]
+
+        # Build and return the sample
+        sample = hcat(flow_df, rainfall_df[:, 3:end])
+        return sample
 end

@@ -2,11 +2,19 @@ using DataFrames, CSV
 using LinearAlgebra, Statistics
 using ProgressMeter, CairoMakie
 
-include("./Helpers.jl")
-using .Helpers
+if !@isdefined Helpers
+        include("./Helpers.jl")
+        import .Helpers: assembler, builder 
+        import .Helpers: writeout, savefig 
+end
 
-include("./Plotters.jl")
-using .Plotters
+if !@isdefined Plotters 
+        include("./Plotters.jl")
+        import .Plotters: plot_timeseries 
+end
 
-include("./Math.jl")
-using .Math
+if !@isdefined Math 
+        include("./Math.jl")
+        import .Math: standardize 
+        import .Math: generate_power_set, import_test_functions 
+end

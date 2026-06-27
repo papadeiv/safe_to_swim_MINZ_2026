@@ -117,7 +117,7 @@ function plot_distribution(sample)
                 plt_idx < 9 && (ax3.title = titles[idx+2])
 
                 # Export the figure
-                savefig("distribution/$plt_idx.png", fig)
+                savefig("distribution/$plt_idx.pdf", fig)
                 plt_idx = plt_idx + 1
         end
 end

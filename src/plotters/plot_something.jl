@@ -1,4 +1,4 @@
-using GLMakie
+#using GLMakie
 
 # Create and format the figure
 fig = Figure(; size = (1200, 600))
@@ -20,4 +20,4 @@ ax = Axis(fig[1, 1],
 
 # Plot ?????????? 
 #lines!(ax, ???, ???)
-fig
+#fig

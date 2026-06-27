@@ -2,15 +2,9 @@ using CairoMakie
 
 include("../helpers/utils.jl")
 
-function plot_timeseries(flow_data, rainfall_data, sitenames)
-        # Extract the timeseries
-        flow = flow_data[!,[1,3]]
-        rainfall = rainfall_data[!,[1,3]]
-        larger_df = nrow(flow_data) >= nrow(rainfall_data) ? flow_data : rainfall_data
-        ecoli = larger_df[:, 1:2]
-
+function plot_timeseries(ecoli, flow, rainfall, sitenames)
         # Create and format the figure
-        fig = Figure(; size = (900, 600))
+        fig = Figure(; size = (1200, 800))
         ax1 = Axis(fig[1,1],
                    xgridvisible = false,
                    ygridvisible = false,
@@ -58,10 +52,10 @@ function plot_timeseries(flow_data, rainfall_data, sitenames)
                   )
 
         # Plot the timeseries
-        lines!(ax1, flow[:,1], flow[:,2])
-        lines!(ax2, rainfall[:,1], rainfall[:,2])
+        lines!(ax1, ecoli[:,1], flow)
+        lines!(ax2, ecoli[:,1], rainfall)
         lines!(ax3, ecoli[:,1], ecoli[:,2])
 
         # Export the figure
-        savefig("timeseries.png", fig)
+        savefig("timeseries.pdf", fig)
 end
